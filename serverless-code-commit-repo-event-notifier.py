@@ -25,8 +25,6 @@ def set_global_vars():
         global_vars['Owner']                    = "Mystique"
         global_vars['Environment']              = "Prod"
         global_vars['tag_name']                 = "serverless-code-commit-repo-event-notifier"
-        global_vars['repo_name']                = "predict-attire-for-weather"
-        global_vars['branch_name']              = "master"
         global_vars['slack_webhook_url']        = os.environ.get("slack_webhook_url")
         global_vars['sns_topic_arn']            = os.environ.get("sns_topic_arn")
         global_vars['status']                   = True
@@ -76,11 +74,11 @@ def post_to_slack(webhook_url, slack_data):
                     }
                 ]
         tmp["footer"]           = "AWS CodeCommit"
-        tmp["footer_icon"]      = "https://raw.githubusercontent.com/miztiik/serverless-code-commit-repo-event-notifier/master/images/kms_icon.png"
+        tmp["footer_icon"]      = "https://raw.githubusercontent.com/miztiik/serverless-code-commit-repo-event-notifier/master/images/aws-code-commit-logo.png"
         tmp["ts"]               = int( dateutil.parser.parse( i.get('eventTime') ).timestamp()  )
         tmp["mrkdwn_in"]        = ["pretext", "text", "fields"]
         slack_msg["attachments"].append(tmp)
-    logger.info( json.dumps(slack_msg, indent=4, sort_keys=True) )
+    # logger.info( json.dumps(slack_msg, indent=4, sort_keys=True) )
 
     # slack_payload = {'text':json.dumps(i)}
     try:
@@ -89,6 +87,7 @@ def post_to_slack(webhook_url, slack_data):
     except Exception as e:
         logger.error( f"ERROR:{str(e)}" )
         resp["error_message"] = f"ERROR:{str(e)}"
+
     if p_resp.status_code < 400:
         logger.info(f"INFO: Message posted successfully. Resonse:{p_resp.text}")
         resp["error_message"] = f"{p_resp.text}"
@@ -126,7 +125,7 @@ def lambda_handler(event, context):
         if global_vars.get('slack_webhook_url'):
             post_to_slack( global_vars.get('slack_webhook_url'), event )
 
-        resp[repo_data] = response['repositoryMetadata']
+        resp['repo_data'] = response['repositoryMetadata']
         resp['status'] = True
     except Exception as err:
         logger.error(f"Error getting repository: {repository}. Make sure it exists and that your repository is in the same region as this function. ERROR: {str(err)}")
