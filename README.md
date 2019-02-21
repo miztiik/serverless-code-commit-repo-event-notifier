@@ -13,7 +13,7 @@ A simple lambda function that gets triggerred in response to an AWS CodeCommit r
         - `AWSLambdaBasicExecutionRole` - To allow Lambda to log events
         - `AWSCodeCommitReadOnly` - To allow Lambda to read repometa
 
-1. ## Configure Lambda Function - `Serverless KMS Sentry`
+1. ## Configure Lambda Function
     - The python script is written(_and tested_) in `Python 3.7`.
     - `Copy` the code from `serverless-code-commit-repo-event-notifier` in this repo to the lambda function
     - _Optional:_ Add slack `slack_webhook_url` in the environment variable
