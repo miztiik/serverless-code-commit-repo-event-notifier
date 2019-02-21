@@ -1,6 +1,6 @@
 # Serverless AWS CodeCommit Repository Event Notifier
 
-A simple lambda function to monitor _certain_ KMS events through cloudtrail and notify users or security team through slack.
+A simple lambda function that gets triggerred in response to an AWS CodeCommit repository events and update the team in slack.
 
 ![Fig : Serverless AWS CodeCommit Repository Event Notifier](https://raw.githubusercontent.com/miztiik/serverless-code-commit-repo-event-notifier/master/images/serverless-code-commit-repo-event-notifier.png)
 
@@ -34,4 +34,5 @@ A simple lambda function to monitor _certain_ KMS events through cloudtrail and 
     Now your lambda function should be triggered when ever there is a CodeCommit event in your repository
 
 1. Testing the solution
+    
     Create a new commit/branch in your repo, you should be getting the message in Slack(if configured).
