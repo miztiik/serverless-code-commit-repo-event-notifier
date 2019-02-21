@@ -8,10 +8,10 @@ A simple lambda function that gets triggerred in response to an AWS CodeCommit r
 
 1. ## Pre-Requisities
     We will need the following pre-requisites to successfully complete this activity,
-    - `AWS CodeCommit Repo` - [Get help here to setup cloudtrail](https://youtu.be/9vYdORRoQdg) 
+    - `AWS CodeCommit Repo` - [Get help here to setup CodeCommit Repo](https://youtu.be/9vYdORRoQdg) 
     - IAM Role - _i.e_ `Lambda Service Role` - _with managed permissions_ [Get Help for setting up IAM Role](https://www.youtube.com/watch?v=5g0Cuq-qKA0&list=PLxzKY3wu0_FLaF9Xzpyd9p4zRCikkD9lE&index=11)
         - `AWSLambdaBasicExecutionRole` - To allow Lambda to log events
-        - `AWSCodeCommitReadOnly` - To allow Lambda to read repometa
+        - `AWSCodeCommitReadOnly` - To allow Lambda to read repo metadata
 
 1. ## Configure Lambda Function
     - The python script is written(_and tested_) in `Python 3.7`.
