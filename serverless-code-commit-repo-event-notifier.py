@@ -62,6 +62,15 @@ def post_to_slack(webhook_url, slack_data):
         tmp["title_link"]       = f"https://console.aws.amazon.com/codesuite/codecommit/repositories/{i.get('eventSourceARN').split(':')[-1]}/browse?region={i.get('awsRegion')}"
         tmp["fields"]           = [
                     {
+                        "title": "Repo Name",
+                        "value": f"`{i.get('repo_metadata').get('repositoryName')}`",
+                        "short": True
+                    },
+                        "title": "Repo Default Branch",
+                        "value": f"`{i.get('repo_metadata').get('defaultBranch')}`",
+                        "short": True
+                    },
+                    {
                         "title": "Triggered-By",
                         "value": f"`{i.get('userIdentityARN')}`",
                         "short": True
@@ -118,11 +127,12 @@ def lambda_handler(event, context):
     repository = event['Records'][0]['eventSourceARN'].split(':')[5]
     try:
         response = codecommit.get_repository(repositoryName=repository)
+        event['repo_metadata'] = response.get('repositoryMetadata')
         logger.info(f"Clone URL: {response['repositoryMetadata']['cloneUrlHttp']}")
         
         # Update backup status to SNS Topic
         if global_vars.get('slack_webhook_url'):
-            post_to_slack( global_vars.get('slack_webhook_url'), event )
+            post_to_slack( global_vars.get('slack_webhook_url'), event)
 
         resp['repo_data'] = response['repositoryMetadata']
         resp['status'] = True
