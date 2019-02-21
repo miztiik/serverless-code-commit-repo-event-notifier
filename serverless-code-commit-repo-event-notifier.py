@@ -59,17 +59,16 @@ def post_to_slack(webhook_url, slack_data):
         tmp["author_link"]      = "https://github.com/miztiik/serverless-code-commit-repo-event-notifier"
         tmp["author_icon"]      = "https://avatars1.githubusercontent.com/u/12252564?s=400&u=20375d438d970cb22cc4deda79c1f35c3099f760&v=4"
         tmp["title"]            = f"Repo Event: {i.get('eventName')}"
-        tmp["title_link"]       = f"https://console.aws.amazon.com/codesuite/codecommit/repositories/{i.get('eventSourceARN').split(':')[-1]}"
         tmp["title_link"]       = f"https://console.aws.amazon.com/codesuite/codecommit/repositories/{i.get('eventSourceARN').split(':')[-1]}/browse?region={i.get('awsRegion')}"
         tmp["fields"]           = [
                     {
-                        "title": "Trigger Name",
-                        "value": f"`{i.get('eventTriggerName')}`",
+                        "title": "Triggered-By",
+                        "value": f"`{i.get('userIdentityARN')}`",
                         "short": True
                     },
                     {
-                        "title": "Triggered-By",
-                        "value": f"`{i.get('userIdentityARN')}`",
+                        "title": "Trigger Name",
+                        "value": f"`{i.get('eventTriggerName')}`",
                         "short": True
                     }
                 ]
