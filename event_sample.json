@@ -1,0 +1,27 @@
+{
+  "Records": [
+    {
+      "awsRegion": "ap-northeast-2",
+      "codecommit": {
+        "references": [
+          {
+            "commit": "0af56d63d8eb4c9029df040038d7e95f75e8fd50",
+            "ref": "refs/heads/test"
+          }
+        ]
+      },
+      "customData": "",
+      "eventId": "bdc961ec-49c1-428a-b498-0d644de9caa3",
+      "eventName": "ReferenceChanges",
+      "eventPartNumber": 1,
+      "eventSource": "aws:codecommit",
+      "eventSourceARN": "arn:aws:codecommit:ap-northeast-2:t:t",
+      "eventTime": "2020-02-16T05:55:30.460+0000",
+      "eventTotalParts": 1,
+      "eventTriggerConfigId": "2486e6c5-7c56-40a2-a603-f96115f1465a",
+      "eventTriggerName": "test",
+      "eventVersion": "1.0",
+      "userIdentityARN": "arn:aws:iam::t:user/t"
+    }
+  ]
+}
