@@ -34,7 +34,7 @@ def set_global_vars():
     return global_vars
 
 
-def post_to_slack(webhook_url, slack_data):
+def post_to_slack(webhook_url, slack_data, record):
     """
     Post message to given slack channel/url
 
@@ -50,43 +50,43 @@ def post_to_slack(webhook_url, slack_data):
     slack_msg = {}
     slack_msg["text"] = ''
     slack_msg["attachments"] = []
-    for i in slack_data.get("Records"):
-        tmp = {}
-        tmp["fallback"] = "Event Detected."
-        tmp["color"] = i.get("color")
-        tmp["pretext"] = f"CodeCommit Event detected in `{i.get('awsRegion')}` in Repo:`{i.get('eventSourceARN').split(':')[-1]}`"
-        tmp["author_name"] = "Serverless-Repo-Monitor"
-        tmp["author_link"] = "https://github.com/miztiik/serverless-code-commit-repo-event-notifier"
-        tmp["author_icon"] = "https://avatars1.githubusercontent.com/u/12252564?s=400&u=20375d438d970cb22cc4deda79c1f35c3099f760&v=4"
-        tmp["title"] = f"Repo Event: {i.get('eventName')}"
-        tmp["title_link"] = f"https://console.aws.amazon.com/codesuite/codecommit/repositories/{i.get('eventSourceARN').split(':')[-1]}/browse?region={i.get('awsRegion')}"
-        tmp["fields"] = [
-            {
-                "title": "Repo Name",
-                "value": f"`{slack_data.get('repo_metadata').get('repositoryName')}`",
-                "short": True
-            },
-            {
-                "title": "Repo Default Branch",
-                "value": f"`{slack_data.get('repo_metadata').get('defaultBranch')}`",
-                "short": True
-            },
-            {
-                "title": "Triggered-By",
-                "value": f"`{i.get('userIdentityARN')}`",
-                "short": True
-            },
-            {
-                "title": "Trigger Name",
-                "value": f"`{i.get('eventTriggerName')}`",
-                "short": True
-            }
-        ]
-        tmp["footer"] = "AWS CodeCommit"
-        tmp["footer_icon"] = "https://raw.githubusercontent.com/miztiik/serverless-code-commit-repo-event-notifier/master/images/aws-code-commit-logo.png"
-        tmp["ts"] = int(dateutil.parser.parse(i.get('eventTime')).timestamp())
-        tmp["mrkdwn_in"] = ["pretext", "text", "fields"]
-        slack_msg["attachments"].append(tmp)
+    tmp = {}
+
+    tmp["fallback"] = "Event Detected."
+    tmp["color"] = record.get("color")
+    tmp["pretext"] = f"CodeCommit Event detected in `{record.get('awsRegion')}` in Repo:`{record.get('eventSourceARN').split(':')[-1]}`"
+    tmp["author_name"] = "Serverless-Repo-Monitor"
+    tmp["author_link"] = "https://github.com/miztiik/serverless-code-commit-repo-event-notifier"
+    tmp["author_icon"] = "https://avatars1.githubusercontent.com/u/12252564?s=400&u=20375d438d970cb22cc4deda79c1f35c3099f760&v=4"
+    tmp["title"] = f"Repo Event: {record.get('eventName')}"
+    tmp["title_link"] = f"https://console.aws.amazon.com/codesuite/codecommit/repositories/{record.get('eventSourceARN').split(':')[-1]}/browse?region={record.get('awsRegion')}"
+    tmp["fields"] = [
+        {
+            "title": "Repo Name",
+            "value": f"`{slack_data.get('repo_metadata').get('repositoryName')}`",
+            "short": True
+        },
+        {
+            "title": "Repo Default Branch",
+            "value": f"`{slack_data.get('repo_metadata').get('defaultBranch')}`",
+            "short": True
+        },
+        {
+            "title": "Triggered-By",
+            "value": f"`{record.get('userIdentityARN')}`",
+            "short": True
+        },
+        {
+            "title": "Trigger Name",
+            "value": f"`{record.get('eventTriggerName')}`",
+            "short": True
+        }
+    ]
+    tmp["footer"] = "AWS CodeCommit"
+    tmp["footer_icon"] = "https://raw.githubusercontent.com/miztiik/serverless-code-commit-repo-event-notifier/master/images/aws-code-commit-logo.png"
+    tmp["ts"] = int(dateutil.parser.parse(record.get('eventTime')).timestamp())
+    tmp["mrkdwn_in"] = ["pretext", "text", "fields"]
+    slack_msg["attachments"].append(tmp)
     logger.info(json.dumps(slack_msg, indent=4, sort_keys=True))
 
     # slack_payload = {'text':json.dumps(i)}
@@ -100,7 +100,7 @@ def post_to_slack(webhook_url, slack_data):
 
     if p_resp.status_code < 400:
         logger.info(
-            f"INFO: Message posted successfully. Resonse:{p_resp.text}")
+            f"INFO: Message posted successfully. Response:{p_resp.text}")
         resp["error_message"] = f"{p_resp.text}"
     elif p_resp.status_code < 500:
         logger.error(f"Unable to post to slack. ERROR: {p_resp.text}")
@@ -113,6 +113,7 @@ def post_to_slack(webhook_url, slack_data):
 
 def lambda_handler(event, context):
     # Can Override the global variables using Lambda Environment Parameters
+    logger.info(f"event:  {str(event)}")
     global_vars = set_global_vars()
     resp = {"status": False, "error_message": ''}
 
@@ -135,7 +136,10 @@ def lambda_handler(event, context):
             f"Clone URL: {response['repositoryMetadata']['cloneUrlHttp']}")
         # Update backup status to SNS Topic
         if global_vars.get('slack_webhook_url'):
-            post_to_slack(global_vars.get('slack_webhook_url'), event)
+            for record in event.get("Records"):
+                post_to_slack(global_vars.get(
+                    'slack_webhook_url'), event, record)
+        logger.info(f"slackData:  {str(event)}")
 
         resp['repo_data'] = response['repositoryMetadata']
         resp['status'] = True
